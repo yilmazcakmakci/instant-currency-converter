@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Instant Currency Converter</title>
+  <link rel="stylesheet" type="text/css" href="../css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Instant Currency Converter</h1>
+      <p class="subtitle">Convert currencies instantly while browsing</p>
+    </div>
+
+    <div class="card">
+      <div class="settings">
+        <div class="currency-select">
+          <label for="defaultCurrency">Convert to:</label>
+          <select id="defaultCurrency">
+            <option value="USD">USD - US Dollar</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="TRY">TRY - Turkish Lira</option>
+            <option value="GBP">GBP - British Pound</option>
+            <option value="JPY">JPY - Japanese Yen</option>
+            <option value="RUB">RUB - Russian Ruble</option>
+            <option value="INR">INR - Indian Rupee</option>
+            <option value="AUD">AUD - Australian Dollar</option>
+            <option value="CAD">CAD - Canadian Dollar</option>
+            <option value="CHF">CHF - Swiss Franc</option>
+            <option value="CNY">CNY - Chinese Yuan</option>
+            <option value="NZD">NZD - New Zealand Dollar</option>
+            <option value="SEK">SEK - Swedish Krona</option>
+            <option value="NOK">NOK - Norwegian Krone</option>
+            <option value="DKK">DKK - Danish Krone</option>
+          </select>
+        </div>
+
+        <div class="toggle-container">
+          <label class="toggle">
+            <input type="checkbox" id="autoConvert">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-label">Auto-convert currencies on page load</span>
+        </div>
+
+        <div class="toggle-container">
+          <label class="toggle">
+            <input type="checkbox" id="showTooltip">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-label">Show tooltip on text selection</span>
+        </div>
+
+        <button id="manualConvert" class="action-button">
+          <i class="fas fa-sync"></i>
+          Convert All Currencies Now
+        </button>
+
+        <button id="resetSettings" class="reset-button">Reset All Settings</button>
+      </div>
+    </div>
+
+    <div class="social-links">
+      <a href="https://twitter.com/yilmazdev" target="_blank" class="social-link">
+        <i class="fab fa-twitter"></i>
+      </a>
+      <a href="https://github.com/yilmazcakmakci" target="_blank" class="social-link">
+        <i class="fab fa-github"></i>
+      </a>
+      <a href="https://linkedin.com/in/yilmazcakmakci" target="_blank" class="social-link">
+        <i class="fab fa-linkedin"></i>
+      </a>
+    </div>
+
+    <div class="support">
+      <a href="https://www.buymeacoffee.com/yilmazc" target="_blank" class="bmc-button">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
+      </a>
+    </div>
+  </div>
+  <script src="../js/popup.js"></script>
+</body>
+</html> 

@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Instant Currency Converter",
+  "version": "1.0",
+  "description": "A Chrome extension that automatically detects and converts currencies on any webpage to your preferred currency in real-time, helping you make informed decisions while shopping online.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://ipcapi.yilmazc.com/*"
+  ],
+  "action": {
+    "default_popup": "src/html/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/js/config.js", "src/js/content.js"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
