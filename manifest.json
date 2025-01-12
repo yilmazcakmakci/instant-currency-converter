@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Instant Currency Converter",
   "version": "1.0",
-  "description": "A Chrome extension that automatically detects and converts currencies on any webpage to your preferred currency in real-time, helping you make informed decisions while shopping online.",
+  "description": "Chrome extension that instantly converts currencies on web pages to your preferred currency.",
   "permissions": [
     "storage",
     "activeTab"
