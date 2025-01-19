@@ -26,41 +26,72 @@ const CURRENCY_SYMBOLS = {
 
 const CURRENCY_REGEX = /([€$₺£¥₽₹])\s*(\d+([.,]\d{1,2})?)|(\d+([.,]\d{1,2})?)\s*([€$₺£¥₽₹])|(\d+([.,]\d{1,2})?)\s*(USD|EUR|TRY|GBP|JPY|RUB|INR|AUD|CAD|CHF|CNY|NZD|SEK|NOK|DKK)/i;
 
+// Logging utility
+const logger = {
+  log: (message, ...args) => {
+    if (config.ENV === 'development') {
+      console.log(message, ...args);
+    }
+  },
+  error: (message, ...args) => {
+    if (config.ENV === 'development') {
+      console.error(message, ...args);
+    }
+  }
+};
+
 // Cache Functions
 async function getCachedRates(currencyCode) {
   try {
+    logger.log('🔍 Checking cache for', currencyCode);
     const cache = await chrome.storage.local.get(currencyCode);
-    if (!cache[currencyCode]) return null;
+    
+    if (!cache[currencyCode]) {
+      logger.log('❌ No cache found for', currencyCode);
+      return null;
+    }
 
     const { timestamp, rates } = cache[currencyCode];
     if (!isCacheValid(timestamp)) {
+      logger.log('⏰ Cache expired for', currencyCode);
       await chrome.storage.local.remove(currencyCode);
       return null;
     }
 
+    logger.log('✅ Valid cache found for', currencyCode);
     return rates;
   } catch (error) {
-    console.error('Error reading from cache:', error);
+    logger.error('Error reading from cache:', error);
     return null;
   }
 }
 
 async function setCachedRates(currencyCode, data) {
   try {
-    await chrome.storage.local.set({
+    const cacheData = {
       [currencyCode]: {
-        timestamp: data.timestamp,
+        timestamp: new Date().toISOString(),
         rates: data.rates
       }
-    });
+    };
+    
+    await chrome.storage.local.set(cacheData);
+    logger.log('💾 Successfully cached rates for', currencyCode);
   } catch (error) {
-    console.error('Error writing to cache:', error);
+    logger.error('Error writing to cache:', error);
   }
 }
 
 function isCacheValid(timestamp) {
+  if (!timestamp) return false;
+  
   const cacheDate = new Date(timestamp);
   const now = new Date();
+  
+  // Check if the dates are valid
+  if (isNaN(cacheDate.getTime()) || isNaN(now.getTime())) {
+    return false;
+  }
   
   return (
     now.getDate() === cacheDate.getDate() &&
@@ -81,26 +112,34 @@ const state = {
 // API Functions
 async function fetchRates(currencyCode) {
   try {
+    if (!currencyCode) {
+      logger.error('❌ No currency code provided to fetchRates');
+      return null;
+    }
+
     // First check cache for default currency
-    const cachedRates = await getCachedRates(state.defaultCurrency);
+    const cachedRates = await getCachedRates(currencyCode);
     if (cachedRates) {
-      console.log('Using cached rates for', state.defaultCurrency);
-      state.rates = { ...cachedRates, base: state.defaultCurrency };
-      return state.rates;
+      logger.log('✅ Using CACHED rates for', currencyCode);
+      return { ...cachedRates, base: currencyCode };
     }
 
     // If not in cache, fetch from API using default currency as base
-    console.log('Fetching rates from API for', state.defaultCurrency);
-    const response = await fetch(`${config.API_URL}/api/rates?base=${state.defaultCurrency}`);
+    logger.log('🔄 Cache miss! Fetching NEW rates from API for', currencyCode);
+    const response = await fetch(`${config.API_URL}/api/rates?base=${currencyCode}`);
     const data = await response.json();
     
-    // Save to cache
-    await setCachedRates(state.defaultCurrency, data);
+    if (!data || !data.rates) {
+      logger.error('❌ Invalid API response:', data);
+      return null;
+    }
     
-    state.rates = { ...data.rates, base: state.defaultCurrency };
-    return state.rates;
+    // Save to cache
+    await setCachedRates(currencyCode, data);
+    
+    return { ...data.rates, base: currencyCode };
   } catch (error) {
-    console.error('Error fetching rates:', error);
+    logger.error('❌ Error fetching rates:', error);
     return null;
   }
 }
@@ -209,7 +248,10 @@ async function updateNodeWithConversions(node, matches, cleanText) {
 
   // Fetch rates once using default currency as base
   if (!state.rates || state.rates.base !== state.defaultCurrency) {
-    state.rates = await fetchRates(state.defaultCurrency);
+    const newRates = await fetchRates(state.defaultCurrency);
+    if (newRates) {
+      state.rates = newRates;
+    }
   }
 
   if (!state.rates) return;
@@ -242,7 +284,7 @@ async function updateNodeWithConversions(node, matches, cleanText) {
       span.textContent = text;
       node.parentNode.replaceChild(span, node);
     } catch (error) {
-      console.error('Error replacing node:', error);
+      logger.error('Error replacing node:', error);
     }
   }
 }
@@ -270,7 +312,10 @@ async function handleTextSelection(e) {
 
   // Fetch rates once using default currency as base
   if (!state.rates || state.rates.base !== state.defaultCurrency) {
-    state.rates = await fetchRates(state.defaultCurrency);
+    const newRates = await fetchRates(state.defaultCurrency);
+    if (newRates) {
+      state.rates = newRates;
+    }
   }
 
   if (state.rates && currency.currencyCode !== state.defaultCurrency) {
@@ -355,7 +400,7 @@ async function initialize() {
       createTooltip();
     }
   } catch (error) {
-    console.error('Error initializing:', error);
+    logger.error('Error initializing:', error);
   }
 }
 

@@ -1,9 +1,11 @@
 const ENV = {
   development: {
-    API_URL: 'http://localhost:3000'
+    API_URL: 'http://localhost:3000',
+    ENV: 'development'
   },
   production: {
-    API_URL: 'https://ipcapi.yilmazc.com'
+    API_URL: 'https://ipcapi.yilmazc.com',
+    ENV: 'production'
   }
 };
 
